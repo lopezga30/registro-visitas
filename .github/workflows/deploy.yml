@@ -55,7 +55,7 @@ jobs:
         run: |
           echo "s3_bucket=$(terraform output -raw s3_bucket)" >> $GITHUB_OUTPUT
           echo "api_url=$(terraform output -raw api_url)" >> $GITHUB_OUTPUT
-          echo "cloudfront_id=$(terraform output -raw cloudfront_url | sed 's|https://||' | cut -d'.' -f1)" >> $GITHUB_OUTPUT
+          echo "cloudfront_id=$(terraform output -raw cloudfront_distribution_id)" >> $GITHUB_OUTPUT
         env:
           TF_VAR_environment: ${{ env.ENVIRONMENT }}
 
@@ -71,13 +71,13 @@ jobs:
 
       - name: Invalidate CloudFront cache
         run: |
-          DIST_ID=$(aws cloudfront list-distributions \
-            --query "DistributionList.Items[?Origins.Items[0].DomainName=='${{ steps.infra.outputs.s3_bucket }}.s3.amazonaws.com'].Id" \
-            --output text)
-          aws cloudfront create-invalidation --distribution-id $DIST_ID --paths "/*"
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ steps.infra.outputs.cloudfront_id }} \
+            --paths "/*"
 
       - name: Print site URL
+        working-directory: infra
         run: |
-          echo "✅ Sitio desplegado en: https://$(aws cloudfront list-distributions \
-            --query "DistributionList.Items[?Origins.Items[0].DomainName=='${{ steps.infra.outputs.s3_bucket }}.s3.amazonaws.com'].DomainName" \
-            --output text)"
+          echo "✅ Sitio desplegado en: $(terraform output -raw cloudfront_url)"
+        env:
+          TF_VAR_environment: ${{ env.ENVIRONMENT }}

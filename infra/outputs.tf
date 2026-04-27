@@ -3,6 +3,11 @@ output "cloudfront_url" {
   value       = "https://${aws_cloudfront_distribution.frontend.domain_name}"
 }
 
+output "cloudfront_distribution_id" {
+  description = "ID de la distribución CloudFront"
+  value       = aws_cloudfront_distribution.frontend.id
+}
+
 output "api_url" {
   description = "URL base de la API"
   value       = aws_api_gateway_stage.api.invoke_url
