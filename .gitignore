@@ -1,0 +1,16 @@
+# Terraform
+infra/.terraform/
+infra/*.tfplan
+infra/tfplan
+infra/lambda.zip
+infra/.terraform.lock.hcl
+*.tfvars
+!example.tfvars
+
+# Python
+__pycache__/
+*.pyc
+.env
+
+# OS
+.DS_Store

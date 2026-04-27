@@ -1,0 +1,83 @@
+name: Deploy Frontend
+
+on:
+  push:
+    branches: [main, staging]
+    paths: ["frontend/**"]
+  workflow_run:
+    workflows: ["Terraform"]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Entorno a desplegar"
+        required: true
+        default: "staging"
+        type: choice
+        options: [staging, production]
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy ${{ github.event.inputs.environment || (github.ref_name == 'main' && 'production' || 'staging') }}
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion != 'failure' }}
+    environment: ${{ github.event.inputs.environment || (github.ref_name == 'main' && 'production' || 'staging') }}
+
+    env:
+      ENVIRONMENT: ${{ github.event.inputs.environment || (github.ref_name == 'main' && 'production' || 'staging') }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: us-east-1
+
+      - name: Setup Terraform (para leer outputs)
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.7.0"
+          terraform_wrapper: false
+
+      - name: Terraform Init
+        working-directory: infra
+        run: terraform init
+
+      - name: Get infrastructure outputs
+        id: infra
+        working-directory: infra
+        run: |
+          echo "s3_bucket=$(terraform output -raw s3_bucket)" >> $GITHUB_OUTPUT
+          echo "api_url=$(terraform output -raw api_url)" >> $GITHUB_OUTPUT
+          echo "cloudfront_id=$(terraform output -raw cloudfront_url | sed 's|https://||' | cut -d'.' -f1)" >> $GITHUB_OUTPUT
+        env:
+          TF_VAR_environment: ${{ env.ENVIRONMENT }}
+
+      - name: Inject API URL into frontend
+        run: |
+          sed -i "s|%%API_URL%%|${{ steps.infra.outputs.api_url }}|g" frontend/app.js
+
+      - name: Sync frontend to S3
+        run: |
+          aws s3 sync frontend/ s3://${{ steps.infra.outputs.s3_bucket }}/ \
+            --delete \
+            --cache-control "max-age=3600"
+
+      - name: Invalidate CloudFront cache
+        run: |
+          DIST_ID=$(aws cloudfront list-distributions \
+            --query "DistributionList.Items[?Origins.Items[0].DomainName=='${{ steps.infra.outputs.s3_bucket }}.s3.amazonaws.com'].Id" \
+            --output text)
+          aws cloudfront create-invalidation --distribution-id $DIST_ID --paths "/*"
+
+      - name: Print site URL
+        run: |
+          echo "✅ Sitio desplegado en: https://$(aws cloudfront list-distributions \
+            --query "DistributionList.Items[?Origins.Items[0].DomainName=='${{ steps.infra.outputs.s3_bucket }}.s3.amazonaws.com'].DomainName" \
+            --output text)"

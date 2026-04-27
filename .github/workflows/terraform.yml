@@ -1,0 +1,65 @@
+name: Terraform
+
+on:
+  push:
+    branches: [main, staging]
+    paths: ["infra/**", "backend/**"]
+  pull_request:
+    paths: ["infra/**", "backend/**"]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Entorno a desplegar"
+        required: true
+        default: "staging"
+        type: choice
+        options: [staging, production]
+
+permissions:
+  id-token: write   # necesario para OIDC
+  contents: read
+
+jobs:
+  terraform:
+    name: Terraform ${{ github.event.inputs.environment || (github.ref_name == 'main' && 'production' || 'staging') }}
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment || (github.ref_name == 'main' && 'production' || 'staging') }}
+
+    env:
+      TF_VAR_environment: ${{ github.event.inputs.environment || (github.ref_name == 'main' && 'production' || 'staging') }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: us-east-1
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.7.0"
+
+      - name: Terraform Init
+        working-directory: infra
+        run: terraform init
+
+      - name: Terraform Format Check
+        working-directory: infra
+        run: terraform fmt -check
+
+      - name: Terraform Validate
+        working-directory: infra
+        run: terraform validate
+
+      - name: Terraform Plan
+        working-directory: infra
+        run: terraform plan -out=tfplan
+
+      # Apply solo en push a main/staging (no en PRs)
+      - name: Terraform Apply
+        if: github.event_name != 'pull_request'
+        working-directory: infra
+        run: terraform apply -auto-approve tfplan
