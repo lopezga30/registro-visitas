@@ -8,46 +8,61 @@
 </head>
 <body>
 
-  <div class="container">
-
-    <header class="header">
-      <div class="badge">✦ Bienvenido</div>
-      <h1>Registro de Visitas</h1>
-      <p>Dejá tu huella — escribí un mensaje y aparecerá para todos los visitantes.</p>
-    </header>
-
-    <div class="form-card">
-      <h2>✍ Nuevo mensaje</h2>
-      <form id="visitForm">
-        <div class="form-group">
-          <label for="name">Tu nombre</label>
-          <input type="text" id="name" placeholder="Ej: María García" maxlength="100" required />
+  <header class="hero">
+    <div class="hero-inner">
+      <div class="hero-tag">✦ Libro de visitas</div>
+      <h1>Tu mensaje,<br><span>para siempre.</span></h1>
+      <p>Un espacio para que dejes tu huella. Escribí algo y aparecerá aquí para todos los visitantes.</p>
+      <div class="hero-stats">
+        <div class="stat">
+          <div class="num" id="heroCount">—</div>
+          <div class="lbl">Mensajes</div>
         </div>
-        <div class="form-group">
-          <label for="message">Tu mensaje</label>
-          <textarea id="message" placeholder="Escribí algo para los demás visitantes..." maxlength="300" required></textarea>
+        <div class="stat">
+          <div class="num">☁️</div>
+          <div class="lbl">Serverless AWS</div>
         </div>
-        <button type="submit" id="submitBtn">Dejar mi mensaje →</button>
-        <p id="formStatus" class="status"></p>
-      </form>
-    </div>
-
-    <div class="messages-header">
-      <h2>Mensajes de visitantes</h2>
-      <span class="count-badge" id="countBadge">0</span>
-    </div>
-
-    <div id="visitsList">
-      <div class="state-message">
-        <div class="icon">⏳</div>
-        <p>Cargando mensajes...</p>
       </div>
     </div>
+  </header>
+
+  <div class="main">
+
+    <aside>
+      <div class="form-panel">
+        <h2>✍ Dejá tu mensaje</h2>
+        <form id="visitForm">
+          <div class="form-group">
+            <label for="name">Tu nombre</label>
+            <input type="text" id="name" placeholder="Ej: María García" maxlength="100" required />
+          </div>
+          <div class="form-group">
+            <label for="message">Mensaje</label>
+            <textarea id="message" placeholder="¿Qué querés dejarle al mundo?" maxlength="300" required></textarea>
+          </div>
+          <button type="submit" id="submitBtn" class="submit-btn">Publicar →</button>
+          <p id="formStatus" class="status"></p>
+        </form>
+      </div>
+    </aside>
+
+    <section class="messages-panel">
+      <h2>
+        Mensajes
+        <span class="count-pill" id="countBadge">0</span>
+      </h2>
+      <div id="visitsList">
+        <div class="state-msg">
+          <div class="icon">⏳</div>
+          <p>Cargando mensajes...</p>
+        </div>
+      </div>
+    </section>
 
   </div>
 
   <footer>
-    Hecho con AWS · Lambda · DynamoDB · CloudFront
+    Construido con Lambda · DynamoDB · S3 · CloudFront · Terraform · GitHub Actions
   </footer>
 
   <script src="app.js"></script>
