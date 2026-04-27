@@ -13,7 +13,7 @@ terraform {
 
   # Estado remoto en S3 — creá el bucket manualmente la primera vez (ver README)
   backend "s3" {
-    bucket = "REEMPLAZAR-tfstate-bucket"
+    bucket = "lopezga30-tfstate"
     key    = "registro-visitas/terraform.tfstate"
     region = "us-east-1"
   }
