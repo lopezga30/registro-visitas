@@ -7,30 +7,48 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+
   <div class="container">
-    <h1>📋 Registro de Visitas</h1>
-    <p class="subtitle">Dejá tu nombre y un mensaje para que todos lo vean</p>
 
-    <form id="visitForm">
-      <div class="form-group">
-        <label for="name">Tu nombre</label>
-        <input type="text" id="name" placeholder="Ej: Juan Pérez" maxlength="100" required />
-      </div>
-      <div class="form-group">
-        <label for="message">Tu mensaje</label>
-        <textarea id="message" placeholder="Escribí algo..." maxlength="300" required></textarea>
-      </div>
-      <button type="submit" id="submitBtn">Dejar mensaje</button>
-      <p id="formStatus" class="status"></p>
-    </form>
+    <header class="header">
+      <div class="badge">✦ Bienvenido</div>
+      <h1>Registro de Visitas</h1>
+      <p>Dejá tu huella — escribí un mensaje y aparecerá para todos los visitantes.</p>
+    </header>
 
-    <hr />
-
-    <h2>Mensajes de visitantes</h2>
-    <div id="visitsList">
-      <p class="loading">Cargando mensajes...</p>
+    <div class="form-card">
+      <h2>✍ Nuevo mensaje</h2>
+      <form id="visitForm">
+        <div class="form-group">
+          <label for="name">Tu nombre</label>
+          <input type="text" id="name" placeholder="Ej: María García" maxlength="100" required />
+        </div>
+        <div class="form-group">
+          <label for="message">Tu mensaje</label>
+          <textarea id="message" placeholder="Escribí algo para los demás visitantes..." maxlength="300" required></textarea>
+        </div>
+        <button type="submit" id="submitBtn">Dejar mi mensaje →</button>
+        <p id="formStatus" class="status"></p>
+      </form>
     </div>
+
+    <div class="messages-header">
+      <h2>Mensajes de visitantes</h2>
+      <span class="count-badge" id="countBadge">0</span>
+    </div>
+
+    <div id="visitsList">
+      <div class="state-message">
+        <div class="icon">⏳</div>
+        <p>Cargando mensajes...</p>
+      </div>
+    </div>
+
   </div>
+
+  <footer>
+    Hecho con AWS · Lambda · DynamoDB · CloudFront
+  </footer>
 
   <script src="app.js"></script>
 </body>
