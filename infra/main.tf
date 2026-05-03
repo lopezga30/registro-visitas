@@ -154,6 +154,11 @@ resource "aws_iam_role_policy" "lambda_dynamo" {
         Effect   = "Allow"
         Action   = ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"]
         Resource = "arn:aws:logs:*:*:*"
+      },
+      {
+        Effect   = "Allow"
+        Action   = ["ses:SendEmail", "ses:SendRawEmail"]
+        Resource = "*"
       }
     ]
   })
@@ -168,7 +173,11 @@ resource "aws_lambda_function" "visits" {
   runtime          = "python3.12"
 
   environment {
-    variables = { TABLE_NAME = aws_dynamodb_table.visits.name }
+    variables = {
+      TABLE_NAME         = aws_dynamodb_table.visits.name
+      NOTIFICATION_EMAIL = var.notification_email
+      SITE_URL           = "https://${aws_cloudfront_distribution.frontend.domain_name}"
+    }
   }
 }
 

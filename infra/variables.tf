@@ -18,3 +18,9 @@ variable "environment" {
     error_message = "El entorno debe ser staging o production."
   }
 }
+
+variable "notification_email" {
+  description = "Email al que se envían las notificaciones de nuevos mensajes"
+  type        = string
+  default     = "lopezga30@hotmail.com"
+}
