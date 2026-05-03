@@ -176,6 +176,7 @@ resource "aws_lambda_function" "visits" {
     variables = {
       TABLE_NAME         = aws_dynamodb_table.visits.name
       NOTIFICATION_EMAIL = var.notification_email
+      SENDER_EMAIL       = var.sender_email
       SITE_URL           = "https://${aws_cloudfront_distribution.frontend.domain_name}"
     }
   }

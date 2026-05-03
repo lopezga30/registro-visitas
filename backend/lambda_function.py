@@ -8,7 +8,8 @@ from boto3.dynamodb.conditions import Key
 
 TABLE_NAME = os.environ["TABLE_NAME"]
 NOTIFICATION_EMAIL = os.environ.get("NOTIFICATION_EMAIL", "")
-SITE_URL = os.environ.get("SITE_URL", "")
+SENDER_EMAIL       = os.environ.get("SENDER_EMAIL", "")
+SITE_URL           = os.environ.get("SITE_URL", "")
 
 dynamodb = boto3.resource("dynamodb")
 table = dynamodb.Table(TABLE_NAME)
@@ -97,7 +98,7 @@ def send_notification(name, message, timestamp):
     text_body = f"Nuevo mensaje en Registro de Visitas\n\nDe: {name}\nFecha: {fecha}\n\nMensaje:\n{message}\n\nVer el sitio: {SITE_URL}"
 
     ses.send_email(
-        Source=NOTIFICATION_EMAIL,
+        Source=f"Registro de Visitas <{SENDER_EMAIL}>",
         Destination={"ToAddresses": [NOTIFICATION_EMAIL]},
         Message={
             "Subject": {"Data": subject, "Charset": "UTF-8"},

@@ -24,3 +24,9 @@ variable "notification_email" {
   type        = string
   default     = "lopezga30@hotmail.com"
 }
+
+variable "sender_email" {
+  description = "Email verificado en SES que se usa como remitente (From)"
+  type        = string
+  default     = "lopezga30@gmail.com"
+}
