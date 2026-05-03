@@ -74,6 +74,10 @@ gh run view <run-id> --log
 gh workflow run deploy.yml --field environment=production
 ```
 
+## Features implementadas
+
+- **Notificaciones por email (SES):** al recibir un mensaje, Lambda envía mail a lopezga30@hotmail.com usando lopezga30@gmail.com como remitente verificado. Hotmail como From fue rechazado silenciosamente por DMARC (p=reject de Microsoft).
+
 ## Próximos pasos sugeridos
 
 1. Agregar ambiente `staging` completo (rama staging + recursos AWS separados)
